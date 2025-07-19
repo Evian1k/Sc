@@ -40,26 +40,34 @@ A comprehensive full-stack school management system built with Flask (backend) a
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Python 3.8 or higher
-- Node.js 16 or higher
-- Git
+- **Python 3.8 or higher**
+- **Node.js 18.0.0 or higher** (tested with Node.js 18.19.1)
+- **npm 8.0.0 or higher**
+- **Git**
+
+> **⚠️ Node.js Version Note**: If you encounter version compatibility issues with Node.js 20+, this project is optimized for Node.js 18.x. See the troubleshooting section below.
 
 ### Installation & Setup
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
-   cd edumanage-pro
+   git clone https://github.com/Evian1k/Sc.git
+   cd Sc
    ```
 
-2. **Run the complete system** (Recommended)
+2. **Quick Fix for Node.js Issues** (if you encounter version errors)
    ```bash
-   chmod +x start.sh
-   ./start.sh
+   ./fix-node-issues.sh
+   ```
+
+3. **Run the complete system** (Recommended)
+   ```bash
+   chmod +x setup.sh
+   ./setup.sh
    ```
    This will start both backend and frontend servers automatically.
 
-3. **Or run servers separately:**
+4. **Or run servers separately:**
 
    **Backend Setup:**
    ```bash
@@ -108,6 +116,65 @@ The system comes with pre-seeded users for testing:
 | Teacher | `john_teacher` | `teacher123` | Teacher access |
 | Student | `alice_student` | `student123` | Student access |
 
+## 🚨 Troubleshooting
+
+### Node.js Version Issues
+
+If you see errors like:
+```
+npm WARN EBADENGINE Unsupported engine
+error when starting dev server: TypeError: crypto.hash is not a function
+```
+
+**Solution 1**: Use the automated fix script
+```bash
+./fix-node-issues.sh
+```
+
+**Solution 2**: Manual fix
+```bash
+cd frontend
+rm -rf node_modules package-lock.json
+npm install
+npm run dev
+```
+
+**Solution 3**: Use Node.js 18.x
+```bash
+# Using nvm (Node Version Manager)
+nvm install 18.19.1
+nvm use 18.19.1
+
+# Then run the setup
+npm install
+npm run dev
+```
+
+### Common Issues
+
+1. **Port already in use**
+   ```bash
+   # Kill processes on ports 5000 and 5173
+   sudo lsof -t -i:5000 | xargs kill -9
+   sudo lsof -t -i:5173 | xargs kill -9
+   ```
+
+2. **Python virtual environment issues**
+   ```bash
+   cd backend
+   rm -rf venv
+   python3 -m venv venv
+   source venv/bin/activate
+   pip install -r requirements.txt
+   ```
+
+3. **Database issues**
+   ```bash
+   cd backend
+   rm -f *.db
+   python seed.py
+   ```
+
 ## 📊 Database Schema
 
 ### Core Models
@@ -123,7 +190,7 @@ The system comes with pre-seeded users for testing:
 ## 🗂 Project Structure
 
 ```
-edumanage-pro/
+Sc/
 ├── backend/                 # Flask backend
 │   ├── app/
 │   │   ├── models/         # Database models
@@ -142,6 +209,8 @@ edumanage-pro/
 │   │   └── utils/         # Utility functions
 │   ├── public/            # Static assets
 │   └── package.json       # Node dependencies
+├── fix-node-issues.sh    # Node.js compatibility fix
+├── setup.sh              # Initial setup script
 ├── start.sh              # Start both servers
 ├── run-backend.sh        # Backend runner script
 ├── run-frontend.sh       # Frontend runner script
