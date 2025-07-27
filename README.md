@@ -87,9 +87,9 @@ A comprehensive full-stack school management system built with Flask (backend) a
 ```bash
 cd backend
 python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate  
 pip install -r requirements.txt
-python seed.py  # Optional: Add sample data
+python seed.py  
 python run.py
 ```
 
