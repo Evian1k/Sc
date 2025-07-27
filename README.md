@@ -1,223 +1,220 @@
-# EduManage Pro - School Management System
+# EduManage Ultimate School Management System
 
-A comprehensive full-stack school management system built with Flask (backend) and React (frontend). This system provides complete functionality for managing students, staff, attendance, grades, and fees.
+A comprehensive, professional-grade school management system built with React (frontend) and Flask (backend).
 
 ## 🌟 Features
 
-### Core Functionality
-- **Student Management**: Add, edit, view, and manage student records
-- **Staff Management**: Manage teachers, administrators, and support staff
-- **Attendance Tracking**: Check-in/check-out system with bulk attendance marking
-- **Grading System**: Complete grade management with automatic GPA calculation
-- **Fee Management**: Track tuition, library, lab, and other fees with payment recording
-- **Role-based Access**: Admin, Teacher, and Student roles with appropriate permissions
+### 📚 Academic Management
+- **Student Management**: Complete student profiles, enrollment, and academic tracking
+- **Staff Management**: Teacher and staff profiles with role-based access
+- **Class Management**: Class creation, subject assignment, and timetable management
+- **Grade Management**: Grade entry, performance analytics, and report cards
+- **Exam Management**: Exam scheduling, result entry, and performance analysis
 
-### Technical Features
-- **Authentication**: JWT-based secure authentication
-- **RESTful API**: Complete REST API with proper error handling
-- **Responsive Design**: Modern, mobile-friendly interface built with Tailwind CSS
-- **Real-time Updates**: Dynamic dashboard with live statistics
-- **Data Validation**: Comprehensive input validation and error handling
-- **Database Seeding**: Pre-populated sample data for testing
+### 💰 Financial Management
+- **Fee Management**: Fee structure setup, payment tracking, and balance monitoring
+- **Payment Processing**: Payment recording and receipt generation
+- **Financial Reports**: Revenue tracking and collection analytics
 
-## 🛠 Technology Stack
+### 📅 Attendance & Monitoring
+- **Daily Attendance**: Manual attendance marking with multiple status options
+- **QR Code Attendance**: Generate and scan QR codes for quick attendance
+- **Attendance Analytics**: Real-time attendance rates and patterns
+- **Parent Notifications**: Automatic SMS/email alerts for attendance
 
-### Backend
-- **Flask**: Python web framework
-- **SQLAlchemy**: Database ORM
-- **Flask-JWT-Extended**: JWT authentication
-- **Flask-CORS**: Cross-origin resource sharing
-- **SQLite**: Database (easily configurable for PostgreSQL/MySQL)
+### 👨‍👩‍👧‍👦 Parent Portal
+- **Multi-child Management**: Parents can monitor multiple children
+- **Academic Progress**: View grades, attendance, and performance
+- **Fee Tracking**: Monitor fee payments and outstanding balances
+- **Communication**: Receive school notifications and updates
 
-### Frontend
-- **React 18**: Modern React with hooks
-- **Vite**: Fast build tool and development server
-- **Tailwind CSS**: Utility-first CSS framework
-- **React Router**: Client-side routing
-- **Axios**: HTTP client for API calls
-- **Heroicons**: Beautiful SVG icons
+### 📊 Analytics & Reporting
+- **Performance Analytics**: Class and subject performance insights
+- **Financial Analytics**: Fee collection and revenue analysis
+- **Attendance Reports**: Detailed attendance statistics
+- **Custom Reports**: Generate various PDF reports
+
+### 🔧 Administrative Features
+- **Multi-tenant Architecture**: Support for multiple schools
+- **Role-based Access Control**: Admin, Teacher, Student, Parent, Accountant roles
+- **School Settings**: Customizable school configuration
+- **User Management**: Complete user account management
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- **Python 3.8 or higher**
-- **Node.js 18.0.0 or higher** (tested with Node.js 18.19.1)
-- **npm 8.0.0 or higher**
-- **Git**
+- **Backend**: Python 3.8+, PostgreSQL (or SQLite for development)
+- **Frontend**: Node.js 16+, npm or yarn
 
-> **⚠️ Node.js Version Note**: If you encounter version compatibility issues with Node.js 20+, this project is optimized for Node.js 18.x. See the troubleshooting section below.
+### 1. Backend Setup
 
-### Installation & Setup
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/Evian1k/Sc.git
-   cd Sc
-   ```
-
-2. **Quick Fix for Node.js Issues** (if you encounter version errors)
-   ```bash
-   ./fix-node-issues.sh
-   ```
-
-3. **Run the complete system** (Recommended)
-   ```bash
-   chmod +x setup.sh
-   ./setup.sh
-   ```
-   This will start both backend and frontend servers automatically.
-
-4. **Or run servers separately:**
-
-   **Backend Setup:**
-   ```bash
-   chmod +x run-backend.sh
-   ./run-backend.sh
-   ```
-
-   **Frontend Setup:** (In a new terminal)
-   ```bash
-   chmod +x run-frontend.sh
-   ./run-frontend.sh
-   ```
-
-### Manual Setup (Alternative)
-
-**Backend:**
 ```bash
+# Navigate to backend directory
 cd backend
-python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Create virtual environment
+python -m venv venv
+
+# Activate virtual environment
+# On Windows:
+venv\Scripts\activate
+# On macOS/Linux:
+source venv/bin/activate
+
+# Install dependencies
 pip install -r requirements.txt
-python seed.py  # Optional: Add sample data
-python run.py
+
+# Set environment variables (create .env file)
+cp .env.example .env
+# Edit .env with your database and configuration settings
+
+# Initialize database
+python -c "from app import create_app, db; app = create_app(); app.app_context().push(); db.create_all()"
+
+# Create default admin user
+python create_admin.py
+
+# Run the backend server
+python app.py
 ```
 
-**Frontend:**
+### 2. Frontend Setup
+
 ```bash
+# Navigate to frontend directory
 cd frontend
+
+# Install dependencies
 npm install
+
+# Create environment file
+cp .env.example .env.local
+# Edit .env.local if needed (default API URL is already set)
+
+# Start development server
 npm run dev
 ```
 
-## 🔗 Access URLs
+### 3. Access the System
 
-- **Frontend Application**: http://localhost:5173
-- **Backend API**: http://localhost:5000
-- **API Documentation**: http://localhost:5000/api (when running)
+1. **Frontend**: http://localhost:5173
+2. **Backend API**: http://localhost:5000
+3. **Default Login**:
+   - **Email**: admin@edumanage.com
+   - **Password**: admin123
 
-## 👤 Default Login Credentials
+## 🔧 Configuration
 
-The system comes with pre-seeded users for testing:
+### Backend Configuration (.env)
+```env
+# Database
+DATABASE_URL=sqlite:///edumanage.db
+# For PostgreSQL: postgresql://username:password@localhost/edumanage
 
-| Role | Username | Password | Description |
-|------|----------|----------|-------------|
-| Admin | `admin` | `admin123` | Full system access |
-| Teacher | `john_teacher` | `teacher123` | Teacher access |
-| Student | `alice_student` | `student123` | Student access |
+# Security
+SECRET_KEY=your-secret-key-here
+JWT_SECRET_KEY=your-jwt-secret-here
 
-## 🚨 Troubleshooting
+# Email Settings (optional)
+MAIL_SERVER=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USE_TLS=True
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=your-app-password
 
-### Node.js Version Issues
+# SMS Settings (optional)
+AFRICASTALKING_USERNAME=your-username
+AFRICASTALKING_API_KEY=your-api-key
 
-If you see errors like:
-```
-npm WARN EBADENGINE Unsupported engine
-error when starting dev server: TypeError: crypto.hash is not a function
-```
-
-**Solution 1**: Use the automated fix script
-```bash
-./fix-node-issues.sh
-```
-
-**Solution 2**: Manual fix
-```bash
-cd frontend
-rm -rf node_modules package-lock.json
-npm install
-npm run dev
-```
-
-**Solution 3**: Use Node.js 18.x
-```bash
-# Using nvm (Node Version Manager)
-nvm install 18.19.1
-nvm use 18.19.1
-
-# Then run the setup
-npm install
-npm run dev
+# Features
+ENABLE_SMS_NOTIFICATIONS=False
+ENABLE_EMAIL_NOTIFICATIONS=False
+ENABLE_QR_ATTENDANCE=True
+MULTI_TENANT_MODE=False
 ```
 
-### Common Issues
+### Frontend Configuration (.env.local)
+```env
+VITE_API_URL=http://localhost:5000/api
+```
 
-1. **Port already in use**
-   ```bash
-   # Kill processes on ports 5000 and 5173
-   sudo lsof -t -i:5000 | xargs kill -9
-   sudo lsof -t -i:5173 | xargs kill -9
-   ```
+## 📱 User Roles & Access
 
-2. **Python virtual environment issues**
-   ```bash
-   cd backend
-   rm -rf venv
-   python3 -m venv venv
-   source venv/bin/activate
-   pip install -r requirements.txt
-   ```
+### 🔑 Admin
+- Complete system access
+- User management
+- School settings
+- Financial oversight
+- Analytics and reports
 
-3. **Database issues**
-   ```bash
-   cd backend
-   rm -f *.db
-   python seed.py
-   ```
+### 👨‍🏫 Teacher
+- Class management
+- Grade entry
+- Attendance marking
+- Student progress monitoring
 
-## 📊 Database Schema
+### 🎓 Student
+- View grades and attendance
+- Access academic records
+- Download report cards
 
-### Core Models
-- **User**: Authentication and base user information
-- **Student**: Student profiles with academic information
-- **Staff**: Staff profiles with employment details
-- **Class**: Class/grade organization
-- **Subject**: Academic subjects
-- **Attendance**: Daily attendance records
-- **Grade**: Academic grades and assessments
-- **Fee**: Fee structure and payment tracking
+### 👨‍👩‍👧‍👦 Parent
+- Monitor children's progress
+- View attendance and grades
+- Track fee payments
+- Receive notifications
 
-## 🗂 Project Structure
+### 💼 Accountant
+- Fee management
+- Payment processing
+- Financial reporting
+
+## 🏗️ Architecture
+
+### Backend (Flask)
+- **API**: RESTful API with JWT authentication
+- **Database**: SQLAlchemy ORM with PostgreSQL/SQLite
+- **Security**: Role-based access control, input validation
+- **Services**: Modular service layer for business logic
+
+### Frontend (React)
+- **UI Framework**: React 18 with modern hooks
+- **Styling**: Tailwind CSS for responsive design
+- **State Management**: Context API for authentication
+- **Routing**: React Router for navigation
+
+### Key Technologies
+- **Backend**: Flask, SQLAlchemy, JWT, Celery, Redis
+- **Frontend**: React, Tailwind CSS, Axios, React Router
+- **Database**: PostgreSQL (production), SQLite (development)
+- **Additional**: QR code generation, PDF reports, SMS/Email integration
+
+## 📁 Project Structure
 
 ```
-Sc/
-├── backend/                 # Flask backend
+edumanage/
+├── backend/                    # Flask backend
 │   ├── app/
-│   │   ├── models/         # Database models
-│   │   ├── routes/         # API endpoints
-│   │   └── __init__.py     # App factory
-│   ├── config.py           # Configuration
-│   ├── requirements.txt    # Python dependencies
-│   ├── seed.py            # Database seeding
-│   └── run.py             # Application runner
-├── frontend/               # React frontend
+│   │   ├── models/            # Database models
+│   │   ├── routes/            # API endpoints
+│   │   ├── services/          # Business logic
+│   │   └── __init__.py        # App factory
+│   ├── config.py              # Configuration
+│   ├── app.py                 # Application entry point
+│   └── requirements.txt       # Python dependencies
+├── frontend/                   # React frontend
 │   ├── src/
-│   │   ├── components/    # Reusable components
-│   │   ├── pages/         # Page components
-│   │   ├── contexts/      # React contexts
-│   │   ├── services/      # API services
-│   │   └── utils/         # Utility functions
-│   ├── public/            # Static assets
-│   └── package.json       # Node dependencies
-├── fix-node-issues.sh    # Node.js compatibility fix
-├── setup.sh              # Initial setup script
-├── start.sh              # Start both servers
-├── run-backend.sh        # Backend runner script
-├── run-frontend.sh       # Frontend runner script
-└── README.md            # This file
+│   │   ├── components/        # Reusable components
+│   │   ├── pages/             # Page components
+│   │   ├── contexts/          # React contexts
+│   │   ├── services/          # API services
+│   │   └── App.jsx            # Main app component
+│   ├── package.json           # Node dependencies
+│   └── vite.config.js         # Vite configuration
+└── README.md                  # This file
 ```
 
-## 📚 API Endpoints
+## 🔌 API Endpoints
 
 ### Authentication
 - `POST /api/auth/login` - User login
@@ -225,106 +222,66 @@ Sc/
 - `POST /api/auth/change-password` - Change password
 
 ### Students
-- `GET /api/students` - List students (with pagination)
-- `POST /api/students` - Create new student
-- `GET /api/students/{id}` - Get student details
+- `GET /api/students` - List students
+- `POST /api/students` - Create student
 - `PUT /api/students/{id}` - Update student
 - `DELETE /api/students/{id}` - Delete student
 
 ### Staff
-- `GET /api/staff` - List staff members
-- `POST /api/staff` - Create new staff member
-- `GET /api/staff/{id}` - Get staff details
-- `PUT /api/staff/{id}` - Update staff member
+- `GET /api/staff` - List staff
+- `POST /api/staff` - Create staff member
+- `PUT /api/staff/{id}` - Update staff
+- `DELETE /api/staff/{id}` - Delete staff
+
+### Classes & Subjects
+- `GET /api/classes` - List classes
+- `POST /api/classes` - Create class
+- `GET /api/classes/subjects` - List subjects
+- `POST /api/classes/subjects` - Create subject
 
 ### Attendance
 - `GET /api/attendance` - Get attendance records
-- `POST /api/attendance/check-in` - Mark student check-in
-- `POST /api/attendance/bulk-mark` - Bulk attendance marking
-- `GET /api/attendance/report` - Attendance reports
+- `POST /api/attendance/mark` - Mark attendance
+- `GET /api/attendance/analytics` - Attendance analytics
 
 ### Grades
-- `GET /api/grades` - List grades
-- `POST /api/grades` - Add new grade
-- `GET /api/grades/student/{id}/report` - Student grade report
-- `GET /api/grades/subjects` - List subjects
+- `GET /api/grades` - Get grades
+- `POST /api/grades` - Add grade
+- `GET /api/grades/analytics` - Grade analytics
 
 ### Fees
-- `GET /api/fees` - List fee records
-- `POST /api/fees` - Create fee record
+- `GET /api/fees` - List fees
+- `POST /api/fees` - Create fee
 - `POST /api/fees/{id}/payment` - Record payment
-- `GET /api/fees/student/{id}/summary` - Student fee summary
 
-## 🎨 Features by User Role
+### And many more...
 
-### Admin Dashboard
-- System-wide statistics
-- Student and staff management
-- Fee collection reports
-- System configuration
+## 🧪 Testing
 
-### Teacher Dashboard
-- Class attendance marking
-- Grade entry and management
-- Student performance reports
-- Class-specific analytics
-
-### Student Dashboard
-- Personal attendance history
-- Grade reports and GPA
-- Fee payment status
-- Academic progress tracking
-
-## 🔧 Configuration
-
-### Environment Variables
-Create a `.env` file in the backend directory:
-
-```env
-FLASK_ENV=development
-SECRET_KEY=your-secret-key
-JWT_SECRET_KEY=your-jwt-secret
-DATABASE_URL=sqlite:///edumanage.db
+### Backend Testing
+```bash
+cd backend
+python -m pytest tests/
 ```
 
-### Frontend Configuration
-The frontend automatically proxies API requests to the backend. Update `vite.config.js` if needed:
-
-```javascript
-server: {
-  proxy: {
-    '/api': {
-      target: 'http://localhost:5000',
-      changeOrigin: true,
-      secure: false,
-    },
-  },
-}
+### Frontend Testing
+```bash
+cd frontend
+npm test
 ```
 
-## 📈 Sample Data
+## 📦 Deployment
 
-The system includes comprehensive sample data:
-- 6 classes (Grade 1A, 1B, 2A, 3A, 4A, 5A)
-- 15 students across different grades
-- 4 teachers + 1 admin
-- 7 subjects (Math, English, Science, etc.)
-- 30 days of attendance history
-- Grade records for multiple assessments
-- Fee records with various payment statuses
+### Production Backend
+1. Set up PostgreSQL database
+2. Configure production environment variables
+3. Run database migrations
+4. Deploy with Gunicorn + Nginx
 
-## 🚀 Production Deployment
-
-### Backend (Flask)
-1. Use a production WSGI server (e.g., Gunicorn)
-2. Configure a production database (PostgreSQL recommended)
-3. Set up proper environment variables
-4. Configure reverse proxy (Nginx)
-
-### Frontend (React)
-1. Build the production bundle: `npm run build`
-2. Serve static files with a web server
-3. Configure proper routing for SPA
+### Production Frontend
+1. Build the application: `npm run build`
+2. Deploy to static hosting (Netlify, Vercel, etc.)
+3. Configure API URL for production
 
 ## 🤝 Contributing
 
@@ -334,26 +291,23 @@ The system includes comprehensive sample data:
 4. Add tests if applicable
 5. Submit a pull request
 
-## 📝 License
+## 📄 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 🔮 Future Enhancements
+## 🆘 Support
 
-- **Timetable Management**: Class scheduling and timetable generation
-- **Communication System**: Messages between teachers, students, and parents
-- **Library Management**: Book inventory and borrowing system
-- **Transportation**: Bus route management and tracking
-- **Exam Management**: Comprehensive exam scheduling and management
-- **Reports**: Advanced reporting and analytics
-- **Mobile App**: React Native mobile application
-- **Notifications**: Email and SMS notifications
-- **Document Management**: File uploads and document storage
+For support, email support@edumanage.com or create an issue in the GitHub repository.
 
-## 📞 Support
+## 🎯 Roadmap
 
-For support, please create an issue in the repository or contact the development team.
+- [ ] Mobile app (React Native)
+- [ ] Advanced analytics dashboard
+- [ ] Integration with external services
+- [ ] Multi-language support
+- [ ] Advanced reporting features
+- [ ] Biometric attendance integration
 
 ---
 
-**EduManage Pro** - Making school management simple and efficient! 🎓
+**Made with ❤️ for education management**

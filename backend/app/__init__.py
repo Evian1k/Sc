@@ -146,7 +146,13 @@ def create_app(config_name=None):
     # Initialize database tables and default data
     with app.app_context():
         # Import all models to ensure they're registered
-        from app.models import *
+        from app.models import (
+            User, Student, Staff, Attendance, Grade, Fee, Subject, Class,
+            School, Parent, ParentStudentRelationship, Exam, ExamSchedule, ExamResult,
+            BookCategory, Book, LibraryTransaction, BookReservation,
+            Event, EventRegistration, DisciplinaryRecord, Message,
+            FeeStructure, Timetable, BusRoute
+        )
         
         # Create tables
         db.create_all()
@@ -171,5 +177,4 @@ def create_app(config_name=None):
     
     return app
 
-# Import models to make them available
-from app import models
+# Models are imported in the app context above

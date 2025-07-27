@@ -15,61 +15,11 @@ import Exams from './pages/Exams';
 import Classes from './pages/Classes';
 import Grades from './pages/Grades';
 import Parents from './pages/Parents';
-
-function Library() {
-  return (
-    <div className="space-y-6">
-      <div className="card">
-        <h1 className="text-2xl font-bold text-gray-900">Library Management</h1>
-        <p className="mt-2 text-gray-600">Manage library books, borrowing, and inventory</p>
-      </div>
-    </div>
-  );
-}
-
-function Events() {
-  return (
-    <div className="space-y-6">
-      <div className="card">
-        <h1 className="text-2xl font-bold text-gray-900">Events & Calendar</h1>
-        <p className="mt-2 text-gray-600">Manage school events and calendar</p>
-      </div>
-    </div>
-  );
-}
-
-function Communications() {
-  return (
-    <div className="space-y-6">
-      <div className="card">
-        <h1 className="text-2xl font-bold text-gray-900">Communications</h1>
-        <p className="mt-2 text-gray-600">SMS, Email, and messaging system</p>
-      </div>
-    </div>
-  );
-}
-
-function Reports() {
-  return (
-    <div className="space-y-6">
-      <div className="card">
-        <h1 className="text-2xl font-bold text-gray-900">Reports & Analytics</h1>
-        <p className="mt-2 text-gray-600">Generate reports and view analytics</p>
-      </div>
-    </div>
-  );
-}
-
-function Settings() {
-  return (
-    <div className="space-y-6">
-      <div className="card">
-        <h1 className="text-2xl font-bold text-gray-900">School Settings</h1>
-        <p className="mt-2 text-gray-600">Manage school configuration and preferences</p>
-      </div>
-    </div>
-  );
-}
+import Library from './pages/Library';
+import Events from './pages/Events';
+import Communications from './pages/Communications';
+import Reports from './pages/Reports';
+import Settings from './pages/Settings';
 
 // Protected Route component
 function ProtectedRoute({ children, allowedRoles = [] }) {
