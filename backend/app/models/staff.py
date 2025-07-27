@@ -1,5 +1,6 @@
 from app import db
 from datetime import datetime
+from sqlalchemy import Numeric  # ✅ Required for salary field
 
 class Staff(db.Model):
     __tablename__ = 'staff'
@@ -13,9 +14,9 @@ class Staff(db.Model):
     gender = db.Column(db.String(10), nullable=False)
     phone = db.Column(db.String(20))
     address = db.Column(db.Text)
-    position = db.Column(db.String(100), nullable=False)  # Teacher, Principal, Admin, etc.
+    position = db.Column(db.String(100), nullable=False)  # e.g., Teacher, Principal
     department = db.Column(db.String(100))
-    salary = db.Column(db.Decimal(10, 2))
+    salary = db.Column(Numeric(10, 2))  # ✅ Corrected line
     hire_date = db.Column(db.Date, default=datetime.utcnow().date)
     qualification = db.Column(db.Text)
     emergency_contact = db.Column(db.String(100))
@@ -48,7 +49,7 @@ class Staff(db.Model):
             'emergency_contact': self.emergency_contact,
             'emergency_phone': self.emergency_phone,
             'is_active': self.is_active,
-            'email': self.user.email if self.user else None,
+            'email': self.user.email if hasattr(self, 'user') and self.user else None,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }

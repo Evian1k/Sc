@@ -7,17 +7,17 @@ class Fee(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=False)
     fee_type = db.Column(db.String(50), nullable=False)  # tuition, library, lab, transport, etc.
-    amount = db.Column(db.Decimal(10, 2), nullable=False)
+    amount = db.Column(db.Numeric(10, 2), nullable=False)
     due_date = db.Column(db.Date, nullable=False)
-    paid_amount = db.Column(db.Decimal(10, 2), default=0)
+    paid_amount = db.Column(db.Numeric(10, 2), default=0)
     payment_date = db.Column(db.Date)
     payment_method = db.Column(db.String(50))  # cash, card, online, bank_transfer
     transaction_id = db.Column(db.String(100))
     status = db.Column(db.String(20), default='pending')  # pending, paid, partial, overdue
     semester = db.Column(db.String(20))
     academic_year = db.Column(db.String(20))
-    late_fee = db.Column(db.Decimal(10, 2), default=0)
-    discount = db.Column(db.Decimal(10, 2), default=0)
+    late_fee = db.Column(db.Numeric(10, 2), default=0)
+    discount = db.Column(db.Numeric(10, 2), default=0)
     notes = db.Column(db.Text)
     collected_by = db.Column(db.Integer, db.ForeignKey('user.id'))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -25,7 +25,8 @@ class Fee(db.Model):
     
     # Relationships
     collector = db.relationship('User', foreign_keys=[collected_by])
-    
+    student = db.relationship('Student', backref='fees')  # ✅ this line is required
+
     @property
     def balance_amount(self):
         return float(self.amount + self.late_fee - self.discount - self.paid_amount)

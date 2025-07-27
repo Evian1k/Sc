@@ -3,15 +3,15 @@ from datetime import datetime
 
 class Grade(db.Model):
     __tablename__ = 'grades'
-    
+
     id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=False)
     subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id'), nullable=False)
-    assessment_type = db.Column(db.String(50), nullable=False)  # exam, quiz, assignment, project
+    assessment_type = db.Column(db.String(50), nullable=False)  # e.g., exam, quiz, assignment
     assessment_name = db.Column(db.String(100), nullable=False)
-    marks_obtained = db.Column(db.Decimal(5, 2), nullable=False)
-    total_marks = db.Column(db.Decimal(5, 2), nullable=False)
-    percentage = db.Column(db.Decimal(5, 2))
+    marks_obtained = db.Column(db.Numeric(5, 2), nullable=False)
+    total_marks = db.Column(db.Numeric(5, 2), nullable=False)
+    percentage = db.Column(db.Numeric(5, 2))
     grade_letter = db.Column(db.String(5))  # A+, A, B+, B, C, D, F
     semester = db.Column(db.String(20))
     academic_year = db.Column(db.String(20))
@@ -20,19 +20,23 @@ class Grade(db.Model):
     comments = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
+
     # Relationships
     teacher = db.relationship('User', foreign_keys=[teacher_id])
-    
+    student = db.relationship('Student', backref='grades')
+    subject = db.relationship('Subject', backref='grades')
+
     def calculate_percentage(self):
+        """Calculate percentage from marks_obtained and total_marks."""
         if self.total_marks and self.total_marks > 0:
             self.percentage = (self.marks_obtained / self.total_marks) * 100
         return self.percentage
-    
+
     def calculate_grade_letter(self):
+        """Assign grade letter based on percentage."""
         if self.percentage is None:
             self.calculate_percentage()
-        
+
         if self.percentage >= 90:
             self.grade_letter = 'A+'
         elif self.percentage >= 80:
@@ -49,8 +53,9 @@ class Grade(db.Model):
             self.grade_letter = 'F'
         
         return self.grade_letter
-    
+
     def to_dict(self):
+        """Serialize the grade to a dictionary for API responses."""
         return {
             'id': self.id,
             'student_id': self.student_id,
