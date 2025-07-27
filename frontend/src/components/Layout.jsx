@@ -12,15 +12,29 @@ import {
   ArrowRightOnRectangleIcon,
   Bars3Icon,
   XMarkIcon,
+  BookOpenIcon,
+  DocumentTextIcon,
+  UsersIcon,
+  CalendarIcon,
+  ChatBubbleLeftRightIcon,
+  DocumentChartBarIcon,
 } from '@heroicons/react/24/outline';
 
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: HomeIcon, roles: ['admin', 'teacher', 'student'] },
+  { name: 'Dashboard', href: '/', icon: HomeIcon, roles: ['admin', 'teacher', 'student', 'parent'] },
   { name: 'Students', href: '/students', icon: AcademicCapIcon, roles: ['admin', 'teacher'] },
   { name: 'Staff', href: '/staff', icon: UserGroupIcon, roles: ['admin'] },
+  { name: 'Classes', href: '/classes', icon: BookOpenIcon, roles: ['admin', 'teacher'] },
   { name: 'Attendance', href: '/attendance', icon: ClipboardDocumentListIcon, roles: ['admin', 'teacher'] },
-  { name: 'Grades', href: '/grades', icon: ChartBarIcon, roles: ['admin', 'teacher', 'student'] },
-  { name: 'Fees', href: '/fees', icon: BanknotesIcon, roles: ['admin', 'student'] },
+  { name: 'Grades', href: '/grades', icon: ChartBarIcon, roles: ['admin', 'teacher', 'student', 'parent'] },
+  { name: 'Exams', href: '/exams', icon: DocumentTextIcon, roles: ['admin', 'teacher', 'student'] },
+  { name: 'Fees', href: '/fees', icon: BanknotesIcon, roles: ['admin', 'accountant', 'student', 'parent'] },
+  { name: 'Parents', href: '/parents', icon: UsersIcon, roles: ['admin', 'parent'] },
+  { name: 'Library', href: '/library', icon: BookOpenIcon, roles: ['admin', 'teacher', 'student'] },
+  { name: 'Events', href: '/events', icon: CalendarIcon, roles: ['admin', 'teacher', 'student', 'parent'] },
+  { name: 'Communications', href: '/communications', icon: ChatBubbleLeftRightIcon, roles: ['admin', 'teacher'] },
+  { name: 'Reports', href: '/reports', icon: DocumentChartBarIcon, roles: ['admin', 'teacher', 'accountant'] },
+  { name: 'Settings', href: '/settings', icon: CogIcon, roles: ['admin'] },
 ];
 
 function classNames(...classes) {
