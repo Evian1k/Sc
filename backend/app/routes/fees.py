@@ -6,6 +6,7 @@ from app.models.student import Student
 from datetime import datetime, date
 from decimal import Decimal
 from sqlalchemy import func
+from . import enforce_school_scope, current_user
 
 fees_bp = Blueprint('fees', __name__)
 
@@ -22,7 +23,8 @@ def get_fees():
         semester = request.args.get('semester')
         academic_year = request.args.get('academic_year')
         
-        query = Fee.query.join(Student)
+        user = current_user()
+        query = enforce_school_scope(Fee.query, user).join(Student)
         
         if student_id:
             query = query.filter(Fee.student_id == student_id)
@@ -60,7 +62,7 @@ def get_fees():
 @jwt_required()
 def get_fee(fee_id):
     try:
-        fee = Fee.query.get_or_404(fee_id)
+        fee = enforce_school_scope(Fee.query, current_user()).get_or_404(fee_id)
         return jsonify(fee.to_dict()), 200
     
     except Exception as e:
@@ -87,6 +89,8 @@ def create_fee():
         
         fee.update_status()
         
+        user = current_user()
+        fee.school_id = user.school_id if user and user.role != 'platform_owner' else None
         db.session.add(fee)
         db.session.commit()
         
@@ -100,7 +104,7 @@ def create_fee():
 @jwt_required()
 def update_fee(fee_id):
     try:
-        fee = Fee.query.get_or_404(fee_id)
+        fee = enforce_school_scope(Fee.query, current_user()).get_or_404(fee_id)
         data = request.get_json()
         
         # Update fields
@@ -134,7 +138,7 @@ def update_fee(fee_id):
 @jwt_required()
 def delete_fee(fee_id):
     try:
-        fee = Fee.query.get_or_404(fee_id)
+        fee = enforce_school_scope(Fee.query, current_user()).get_or_404(fee_id)
         db.session.delete(fee)
         db.session.commit()
         
@@ -211,6 +215,8 @@ def bulk_create_fees():
                 
                 fee.update_status()
                 
+                user = current_user()
+                fee.school_id = user.school_id if user and user.role != 'platform_owner' else None
                 db.session.add(fee)
                 created_fees.append(fee.to_dict())
                 
@@ -239,7 +245,8 @@ def student_fee_summary(student_id):
         semester = request.args.get('semester')
         academic_year = request.args.get('academic_year')
         
-        query = Fee.query.filter_by(student_id=student_id)
+        user = current_user()
+        query = enforce_school_scope(Fee.query, user).filter_by(student_id=student_id)
         
         if semester:
             query = query.filter(Fee.semester == semester)
@@ -308,7 +315,8 @@ def fee_collection_report():
         fee_type = request.args.get('fee_type')
         status = request.args.get('status')
         
-        query = Fee.query.join(Student)
+        user = current_user()
+        query = enforce_school_scope(Fee.query, user).join(Student)
         
         if start_date and end_date:
             start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
@@ -388,7 +396,8 @@ def get_overdue_fees():
         per_page = request.args.get('per_page', 10, type=int)
         
         # Get fees where due date has passed and status is not paid
-        overdue_fees = Fee.query.filter(
+        user = current_user()
+        overdue_fees = enforce_school_scope(Fee.query, user).filter(
             Fee.due_date < date.today(),
             Fee.status.in_(['pending', 'partial'])
         ).join(Student).paginate(

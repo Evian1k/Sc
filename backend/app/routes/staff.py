@@ -5,6 +5,7 @@ from app.models.user import User
 from app.models.staff import Staff
 from datetime import datetime
 from decimal import Decimal
+from . import enforce_school_scope, current_user, require_role
 
 staff_bp = Blueprint('staff', __name__)
 
@@ -18,7 +19,8 @@ def get_staff():
         position = request.args.get('position', '')
         department = request.args.get('department', '')
         
-        query = Staff.query
+        user = current_user()
+        query = enforce_school_scope(Staff.query, user)
         
         if search:
             query = query.filter(
@@ -51,7 +53,8 @@ def get_staff():
 @jwt_required()
 def get_staff_member(staff_id):
     try:
-        staff = Staff.query.get_or_404(staff_id)
+        user = current_user()
+        staff = enforce_school_scope(Staff.query, user).get_or_404(staff_id)
         return jsonify(staff.to_dict()), 200
     
     except Exception as e:
@@ -67,7 +70,8 @@ def create_staff():
         user = User(
             username=data.get('username'),
             email=data.get('email'),
-            role=data.get('role', 'staff')
+            role=data.get('role', 'staff'),
+            school_id=current_user().school_id if current_user() and current_user().role != 'platform_owner' else data.get('school_id')
         )
         user.set_password(data.get('password', 'staff123'))
         
@@ -77,6 +81,7 @@ def create_staff():
         # Create staff profile
         staff = Staff(
             user_id=user.id,
+            school_id=user.school_id,
             staff_id=data.get('staff_id'),
             first_name=data.get('first_name'),
             last_name=data.get('last_name'),
@@ -108,7 +113,8 @@ def create_staff():
 @jwt_required()
 def update_staff(staff_id):
     try:
-        staff = Staff.query.get_or_404(staff_id)
+        user = current_user()
+        staff = enforce_school_scope(Staff.query, user).get_or_404(staff_id)
         data = request.get_json()
         
         # Update staff fields

@@ -6,6 +6,7 @@ from app.models.student import Student
 from app.models.class_model import Class
 from datetime import datetime, date, time
 from sqlalchemy import func
+from . import enforce_school_scope, current_user
 
 attendance_bp = Blueprint('attendance', __name__)
 
@@ -20,7 +21,8 @@ def get_attendance():
         date_str = request.args.get('date')
         status = request.args.get('status')
         
-        query = Attendance.query.join(Student)
+        user = current_user()
+        query = enforce_school_scope(Attendance.query, user).join(Student)
         
         if student_id:
             query = query.filter(Attendance.student_id == student_id)
@@ -67,7 +69,7 @@ def check_in():
         check_in_time = datetime.strptime(check_in_time, '%H:%M:%S').time()
         
         # Check if attendance already exists for this student on this date
-        existing_attendance = Attendance.query.filter_by(
+        existing_attendance = enforce_school_scope(Attendance.query, current_user()).filter_by(
             student_id=student_id,
             date=attendance_date
         ).first()
@@ -89,6 +91,7 @@ def check_in():
                 notes=notes,
                 marked_by=user_id
             )
+            record.school_id = current_user().school_id if current_user() and current_user().role != 'platform_owner' else None
             db.session.add(record)
         
         db.session.commit()
@@ -118,7 +121,7 @@ def check_out():
         check_out_time = datetime.strptime(check_out_time, '%H:%M:%S').time()
         
         # Find existing attendance record
-        record = Attendance.query.filter_by(
+        record = enforce_school_scope(Attendance.query, current_user()).filter_by(
             student_id=student_id,
             date=attendance_date
         ).first()
@@ -159,7 +162,7 @@ def bulk_mark_attendance():
         
         if class_id:
             # Mark attendance for entire class
-            students = Student.query.filter_by(class_id=class_id, is_active=True).all()
+            students = enforce_school_scope(Student.query, current_user()).filter_by(class_id=class_id, is_active=True).all()
             
             for student in students:
                 # Find student's attendance record in the provided data
@@ -168,7 +171,7 @@ def bulk_mark_attendance():
                     {'status': 'present'}
                 )
                 
-                existing_record = Attendance.query.filter_by(
+                existing_record = enforce_school_scope(Attendance.query, current_user()).filter_by(
                     student_id=student.id,
                     date=attendance_date
                 ).first()
@@ -186,6 +189,7 @@ def bulk_mark_attendance():
                         notes=student_attendance.get('notes', ''),
                         marked_by=user_id
                     )
+                    record.school_id = current_user().school_id if current_user() and current_user().role != 'platform_owner' else None
                     db.session.add(record)
                 
                 processed_records.append(record.to_dict())
@@ -197,7 +201,7 @@ def bulk_mark_attendance():
                 status = attendance_data.get('status', 'present')
                 notes = attendance_data.get('notes', '')
                 
-                existing_record = Attendance.query.filter_by(
+                existing_record = enforce_school_scope(Attendance.query, current_user()).filter_by(
                     student_id=student_id,
                     date=attendance_date
                 ).first()
@@ -215,6 +219,7 @@ def bulk_mark_attendance():
                         notes=notes,
                         marked_by=user_id
                     )
+                    record.school_id = current_user().school_id if current_user() and current_user().role != 'platform_owner' else None
                     db.session.add(record)
                 
                 processed_records.append(record.to_dict())
@@ -234,7 +239,7 @@ def bulk_mark_attendance():
 @jwt_required()
 def update_attendance(attendance_id):
     try:
-        record = Attendance.query.get_or_404(attendance_id)
+        record = enforce_school_scope(Attendance.query, current_user()).get_or_404(attendance_id)
         data = request.get_json()
         user_id = get_jwt_identity()
         
@@ -276,6 +281,7 @@ def attendance_report():
         start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
         end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
         
+        user = current_user()
         query = db.session.query(
             Student.id,
             Student.first_name,
@@ -290,6 +296,8 @@ def attendance_report():
         ).filter(
             Attendance.date.between(start_date, end_date)
         )
+        if user and user.role != 'platform_owner':
+            query = query.filter(Student.school_id == user.school_id)
         
         if class_id:
             query = query.filter(Student.class_id == class_id)

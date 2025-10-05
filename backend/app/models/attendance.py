@@ -5,6 +5,7 @@ class Attendance(db.Model):
     __tablename__ = 'attendance'
     
     id = db.Column(db.Integer, primary_key=True)
+    school_id = db.Column(db.Integer, db.ForeignKey('schools.id'))
     student_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=False)
     date = db.Column(db.Date, nullable=False)
     status = db.Column(db.String(20), nullable=False, default='present')  # present, absent, late, excused
@@ -17,10 +18,12 @@ class Attendance(db.Model):
     
     # Relationships
     marked_by_user = db.relationship('User', foreign_keys=[marked_by])
+    school = db.relationship('School', backref='attendance')
     
     def to_dict(self):
         return {
             'id': self.id,
+            'school_id': self.school_id,
             'student_id': self.student_id,
             'student_name': self.student.full_name if self.student else None,
             'date': self.date.isoformat() if self.date else None,

@@ -27,7 +27,7 @@ A comprehensive full-stack school management system built with Flask (backend) a
 - **SQLAlchemy**: Database ORM
 - **Flask-JWT-Extended**: JWT authentication
 - **Flask-CORS**: Cross-origin resource sharing
-- **SQLite**: Database (easily configurable for PostgreSQL/MySQL)
+- **PostgreSQL**: Primary database with multi-tenant columns
 
 ### Frontend
 - **React 18**: Modern React with hooks
@@ -89,6 +89,7 @@ cd backend
 python3 -m venv venv
 source venv/bin/activate  
 pip install -r requirements.txt
+export DATABASE_URL=postgresql+psycopg2://postgres:postgres@localhost:5432/edumanage
 python seed.py  
 python run.py
 ```

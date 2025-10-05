@@ -5,6 +5,7 @@ class Class(db.Model):
     __tablename__ = 'classes'
     
     id = db.Column(db.Integer, primary_key=True)
+    school_id = db.Column(db.Integer, db.ForeignKey('schools.id'))
     name = db.Column(db.String(100), nullable=False)  # e.g., "Grade 10A", "Class 5B"
     section = db.Column(db.String(10), nullable=False)  # A, B, C, etc.
     grade_level = db.Column(db.Integer, nullable=False)  # 1-12
@@ -16,10 +17,12 @@ class Class(db.Model):
     
     # Relationships
     students = db.relationship('Student', backref='class_enrolled', lazy='dynamic')
+    school = db.relationship('School', backref='classes')
     
     def to_dict(self):
         return {
             'id': self.id,
+            'school_id': self.school_id,
             'name': self.name,
             'section': self.section,
             'grade_level': self.grade_level,

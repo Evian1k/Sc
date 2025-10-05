@@ -15,9 +15,10 @@ fi
 echo "Activating virtual environment..."
 source venv/bin/activate
 
-# Install dependencies
+# Install dependencies and set DATABASE_URL if not set
 echo "Installing Python dependencies..."
 pip install -r requirements.txt
+export DATABASE_URL=${DATABASE_URL:-postgresql+psycopg2://postgres:postgres@localhost:5432/edumanage}
 
 # Run database seeding (optional)
 read -p "Do you want to seed the database with sample data? (y/n): " -n 1 -r
