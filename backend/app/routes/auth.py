@@ -2,8 +2,10 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from app import db
 from app.models.user import User
+from app.models.school import School
 from app.models.student import Student
 from app.models.staff import Staff
+from . import current_user, require_role
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -26,8 +28,10 @@ def login():
             profile = None
             if user.role == 'student' and user.student:
                 profile = user.student.to_dict()
-            elif user.role in ['teacher', 'admin', 'staff'] and user.staff:
+            elif user.role in ['teacher', 'admin', 'staff', 'secretary', 'principal'] and user.staff:
                 profile = user.staff.to_dict()
+            elif user.role == 'platform_owner':
+                profile = {'platform_owner': True}
             
             return jsonify({
                 'access_token': access_token,
@@ -48,6 +52,7 @@ def register():
         email = data.get('email')
         password = data.get('password')
         role = data.get('role', 'student')
+        school_id = data.get('school_id')
         
         if not all([username, email, password]):
             return jsonify({'error': 'Username, email, and password are required'}), 400
@@ -60,7 +65,7 @@ def register():
             return jsonify({'error': 'Email already exists'}), 400
         
         # Create new user
-        user = User(username=username, email=email, role=role)
+        user = User(username=username, email=email, role=role, school_id=school_id)
         user.set_password(password)
         
         db.session.add(user)
@@ -85,8 +90,10 @@ def get_profile():
         profile = None
         if user.role == 'student' and user.student:
             profile = user.student.to_dict()
-        elif user.role in ['teacher', 'admin', 'staff'] and user.staff:
+        elif user.role in ['teacher', 'admin', 'staff', 'secretary', 'principal'] and user.staff:
             profile = user.staff.to_dict()
+        elif user.role == 'platform_owner':
+            profile = {'platform_owner': True}
         
         return jsonify({
             'user': user.to_dict(),

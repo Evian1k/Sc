@@ -5,6 +5,7 @@ class Student(db.Model):
     __tablename__ = 'students'
     
     id = db.Column(db.Integer, primary_key=True)
+    school_id = db.Column(db.Integer, db.ForeignKey('schools.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     student_id = db.Column(db.String(20), unique=True, nullable=False)
     first_name = db.Column(db.String(50), nullable=False)
@@ -26,6 +27,7 @@ class Student(db.Model):
     attendance_records = db.relationship('Attendance', backref='student', lazy='dynamic')
     grades = db.relationship('Grade', backref='student', lazy='dynamic')
     fee_records = db.relationship('Fee', backref='student', lazy='dynamic')
+    school = db.relationship('School', backref='students')
     
     @property
     def full_name(self):
@@ -34,6 +36,7 @@ class Student(db.Model):
     def to_dict(self):
         return {
             'id': self.id,
+            'school_id': self.school_id,
             'user_id': self.user_id,
             'student_id': self.student_id,
             'first_name': self.first_name,

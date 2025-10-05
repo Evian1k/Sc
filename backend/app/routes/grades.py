@@ -7,6 +7,7 @@ from app.models.subject import Subject
 from datetime import datetime
 from decimal import Decimal
 from sqlalchemy import func
+from . import enforce_school_scope, current_user
 
 grades_bp = Blueprint('grades', __name__)
 
@@ -22,7 +23,8 @@ def get_grades():
         semester = request.args.get('semester')
         academic_year = request.args.get('academic_year')
         
-        query = Grade.query.join(Student).join(Subject)
+        user = current_user()
+        query = enforce_school_scope(Grade.query, user).join(Student).join(Subject)
         
         if student_id:
             query = query.filter(Grade.student_id == student_id)
@@ -57,7 +59,7 @@ def get_grades():
 @jwt_required()
 def get_grade(grade_id):
     try:
-        grade = Grade.query.get_or_404(grade_id)
+        grade = enforce_school_scope(Grade.query, current_user()).get_or_404(grade_id)
         return jsonify(grade.to_dict()), 200
     
     except Exception as e:
@@ -90,6 +92,9 @@ def create_grade():
         grade.calculate_percentage()
         grade.calculate_grade_letter()
         
+        # Ensure school scoping
+        user = current_user()
+        grade.school_id = user.school_id if user and user.role != 'platform_owner' else None
         db.session.add(grade)
         db.session.commit()
         
@@ -103,7 +108,7 @@ def create_grade():
 @jwt_required()
 def update_grade(grade_id):
     try:
-        grade = Grade.query.get_or_404(grade_id)
+        grade = enforce_school_scope(Grade.query, current_user()).get_or_404(grade_id)
         data = request.get_json()
         user_id = get_jwt_identity()
         
@@ -139,7 +144,7 @@ def update_grade(grade_id):
 @jwt_required()
 def delete_grade(grade_id):
     try:
-        grade = Grade.query.get_or_404(grade_id)
+        grade = enforce_school_scope(Grade.query, current_user()).get_or_404(grade_id)
         db.session.delete(grade)
         db.session.commit()
         
@@ -153,7 +158,7 @@ def delete_grade(grade_id):
 @jwt_required()
 def get_subjects():
     try:
-        subjects = Subject.query.filter_by(is_active=True).all()
+        subjects = enforce_school_scope(Subject.query, current_user()).filter_by(is_active=True).all()
         return jsonify([subject.to_dict() for subject in subjects]), 200
     
     except Exception as e:
@@ -172,6 +177,8 @@ def create_subject():
             credits=data.get('credits', 3)
         )
         
+        user = current_user()
+        subject.school_id = user.school_id if user and user.role != 'platform_owner' else None
         db.session.add(subject)
         db.session.commit()
         
@@ -213,6 +220,8 @@ def bulk_create_grades():
                 grade.calculate_percentage()
                 grade.calculate_grade_letter()
                 
+                user = current_user()
+                grade.school_id = user.school_id if user and user.role != 'platform_owner' else None
                 db.session.add(grade)
                 created_grades.append(grade.to_dict())
                 
@@ -241,7 +250,8 @@ def student_grade_report(student_id):
         semester = request.args.get('semester')
         academic_year = request.args.get('academic_year')
         
-        query = Grade.query.filter_by(student_id=student_id).join(Subject)
+        user = current_user()
+        query = enforce_school_scope(Grade.query, user).filter_by(student_id=student_id).join(Subject)
         
         if semester:
             query = query.filter(Grade.semester == semester)

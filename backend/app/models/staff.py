@@ -5,6 +5,7 @@ class Staff(db.Model):
     __tablename__ = 'staff'
     
     id = db.Column(db.Integer, primary_key=True)
+    school_id = db.Column(db.Integer, db.ForeignKey('schools.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     staff_id = db.Column(db.String(20), unique=True, nullable=False)
     first_name = db.Column(db.String(50), nullable=False)
@@ -15,7 +16,7 @@ class Staff(db.Model):
     address = db.Column(db.Text)
     position = db.Column(db.String(100), nullable=False)  # Teacher, Principal, Admin, etc.
     department = db.Column(db.String(100))
-    salary = db.Column(db.Decimal(10, 2))
+    salary = db.Column(db.Numeric(10, 2))
     hire_date = db.Column(db.Date, default=datetime.utcnow().date)
     qualification = db.Column(db.Text)
     emergency_contact = db.Column(db.String(100))
@@ -23,6 +24,9 @@ class Staff(db.Model):
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationships
+    school = db.relationship('School', backref='staff')
     
     @property
     def full_name(self):

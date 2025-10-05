@@ -5,6 +5,7 @@ from app.models.user import User
 from app.models.student import Student
 from app.models.class_model import Class
 from datetime import datetime
+from . import enforce_school_scope, current_user, require_role
 
 students_bp = Blueprint('students', __name__)
 
@@ -17,7 +18,8 @@ def get_students():
         search = request.args.get('search', '')
         class_id = request.args.get('class_id', type=int)
         
-        query = Student.query
+        user = current_user()
+        query = enforce_school_scope(Student.query, user)
         
         if search:
             query = query.filter(
@@ -47,7 +49,8 @@ def get_students():
 @jwt_required()
 def get_student(student_id):
     try:
-        student = Student.query.get_or_404(student_id)
+        user = current_user()
+        student = enforce_school_scope(Student.query, user).get_or_404(student_id)
         return jsonify(student.to_dict()), 200
     
     except Exception as e:
@@ -63,7 +66,8 @@ def create_student():
         user = User(
             username=data.get('username'),
             email=data.get('email'),
-            role='student'
+            role='student',
+            school_id=current_user().school_id if current_user() and current_user().role != 'platform_owner' else data.get('school_id')
         )
         user.set_password(data.get('password', 'student123'))
         
@@ -73,6 +77,7 @@ def create_student():
         # Create student profile
         student = Student(
             user_id=user.id,
+            school_id=user.school_id,
             student_id=data.get('student_id'),
             first_name=data.get('first_name'),
             last_name=data.get('last_name'),
@@ -99,7 +104,8 @@ def create_student():
 @jwt_required()
 def update_student(student_id):
     try:
-        student = Student.query.get_or_404(student_id)
+        user = current_user()
+        student = enforce_school_scope(Student.query, user).get_or_404(student_id)
         data = request.get_json()
         
         # Update student fields
@@ -144,7 +150,8 @@ def delete_student(student_id):
 @jwt_required()
 def get_classes():
     try:
-        classes = Class.query.filter_by(is_active=True).all()
+        user = current_user()
+        classes = enforce_school_scope(Class.query, user).filter_by(is_active=True).all()
         return jsonify([cls.to_dict() for cls in classes]), 200
     
     except Exception as e:

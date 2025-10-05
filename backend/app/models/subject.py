@@ -5,6 +5,7 @@ class Subject(db.Model):
     __tablename__ = 'subjects'
     
     id = db.Column(db.Integer, primary_key=True)
+    school_id = db.Column(db.Integer, db.ForeignKey('schools.id'))
     name = db.Column(db.String(100), nullable=False)
     code = db.Column(db.String(20), unique=True, nullable=False)
     description = db.Column(db.Text)
@@ -15,10 +16,12 @@ class Subject(db.Model):
     
     # Relationships
     grades = db.relationship('Grade', backref='subject', lazy='dynamic')
+    school = db.relationship('School', backref='subjects')
     
     def to_dict(self):
         return {
             'id': self.id,
+            'school_id': self.school_id,
             'name': self.name,
             'code': self.code,
             'description': self.description,

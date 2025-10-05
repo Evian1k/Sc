@@ -5,13 +5,14 @@ class Grade(db.Model):
     __tablename__ = 'grades'
     
     id = db.Column(db.Integer, primary_key=True)
+    school_id = db.Column(db.Integer, db.ForeignKey('schools.id'))
     student_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=False)
     subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id'), nullable=False)
     assessment_type = db.Column(db.String(50), nullable=False)  # exam, quiz, assignment, project
     assessment_name = db.Column(db.String(100), nullable=False)
-    marks_obtained = db.Column(db.Decimal(5, 2), nullable=False)
-    total_marks = db.Column(db.Decimal(5, 2), nullable=False)
-    percentage = db.Column(db.Decimal(5, 2))
+    marks_obtained = db.Column(db.Numeric(5, 2), nullable=False)
+    total_marks = db.Column(db.Numeric(5, 2), nullable=False)
+    percentage = db.Column(db.Numeric(5, 2))
     grade_letter = db.Column(db.String(5))  # A+, A, B+, B, C, D, F
     semester = db.Column(db.String(20))
     academic_year = db.Column(db.String(20))
@@ -23,6 +24,7 @@ class Grade(db.Model):
     
     # Relationships
     teacher = db.relationship('User', foreign_keys=[teacher_id])
+    school = db.relationship('School', backref='grades')
     
     def calculate_percentage(self):
         if self.total_marks and self.total_marks > 0:
@@ -53,6 +55,7 @@ class Grade(db.Model):
     def to_dict(self):
         return {
             'id': self.id,
+            'school_id': self.school_id,
             'student_id': self.student_id,
             'student_name': self.student.full_name if self.student else None,
             'subject_id': self.subject_id,

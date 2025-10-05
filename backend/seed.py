@@ -1,5 +1,5 @@
 from app import create_app, db
-from app.models import User, Student, Staff, Class, Subject, Attendance, Grade, Fee
+from app.models import User, School, Student, Staff, Class, Subject, Attendance, Grade, Fee
 from datetime import datetime, date, timedelta
 from decimal import Decimal
 import random
@@ -8,19 +8,24 @@ def seed_database():
     app = create_app()
     
     with app.app_context():
-        # Drop and recreate all tables
+        # Drop and recreate all tables (for local/dev only)
         db.drop_all()
         db.create_all()
         
+        print("Creating schools...")
+        default_school = School(name="Demo School", subdomain="demo", plan="pro", status="active", country="US")
+        db.session.add(default_school)
+        db.session.commit()
+
         print("Creating classes...")
         # Create classes
         classes = [
-            Class(name="Grade 1A", section="A", grade_level=1, academic_year="2023-2024"),
+            Class(name="Grade 1A", section="A", grade_level=1, academic_year="2023-2024", school_id=default_school.id),
             Class(name="Grade 1B", section="B", grade_level=1, academic_year="2023-2024"),
-            Class(name="Grade 2A", section="A", grade_level=2, academic_year="2023-2024"),
-            Class(name="Grade 3A", section="A", grade_level=3, academic_year="2023-2024"),
-            Class(name="Grade 4A", section="A", grade_level=4, academic_year="2023-2024"),
-            Class(name="Grade 5A", section="A", grade_level=5, academic_year="2023-2024"),
+            Class(name="Grade 2A", section="A", grade_level=2, academic_year="2023-2024", school_id=default_school.id),
+            Class(name="Grade 3A", section="A", grade_level=3, academic_year="2023-2024", school_id=default_school.id),
+            Class(name="Grade 4A", section="A", grade_level=4, academic_year="2023-2024", school_id=default_school.id),
+            Class(name="Grade 5A", section="A", grade_level=5, academic_year="2023-2024", school_id=default_school.id),
         ]
         
         for cls in classes:
@@ -31,7 +36,7 @@ def seed_database():
         print("Creating subjects...")
         # Create subjects
         subjects = [
-            Subject(name="Mathematics", code="MATH101", description="Basic Mathematics", credits=3),
+            Subject(name="Mathematics", code="MATH101", description="Basic Mathematics", credits=3, school_id=default_school.id),
             Subject(name="English", code="ENG101", description="English Language Arts", credits=3),
             Subject(name="Science", code="SCI101", description="General Science", credits=3),
             Subject(name="Social Studies", code="SS101", description="Social Studies", credits=2),
@@ -45,9 +50,16 @@ def seed_database():
         
         db.session.commit()
         
-        print("Creating admin user...")
+        print("Creating platform owner and admin user...")
+        # Create platform owner
+        owner_user = User(username="owner", email="owner@edumanage.com", role="platform_owner")
+        owner_user.set_password("owner123")
+        db.session.add(owner_user)
+        db.session.commit()
+        
+        # Create admin/principal user for the school
         # Create admin user
-        admin_user = User(username="admin", email="admin@edumanage.com", role="admin")
+        admin_user = User(username="admin", email="admin@edumanage.com", role="principal", school_id=default_school.id)
         admin_user.set_password("admin123")
         db.session.add(admin_user)
         db.session.commit()
@@ -55,6 +67,7 @@ def seed_database():
         # Create admin staff profile
         admin_staff = Staff(
             user_id=admin_user.id,
+            school_id=default_school.id,
             staff_id="ADM001",
             first_name="System",
             last_name="Administrator",
@@ -100,13 +113,14 @@ def seed_database():
         
         teacher_users = []
         for teacher_data in teachers_data:
-            user = User(username=teacher_data["username"], email=teacher_data["email"], role="teacher")
+            user = User(username=teacher_data["username"], email=teacher_data["email"], role="teacher", school_id=default_school.id)
             user.set_password("teacher123")
             db.session.add(user)
             db.session.flush()
             
             staff = Staff(
                 user_id=user.id,
+                school_id=default_school.id,
                 staff_id=teacher_data["staff_id"],
                 first_name=teacher_data["first_name"],
                 last_name=teacher_data["last_name"],
@@ -151,13 +165,14 @@ def seed_database():
             username = f"{student_data['first_name'].lower()}_student"
             email = f"{student_data['first_name'].lower()}@student.edumanage.com"
             
-            user = User(username=username, email=email, role="student")
+            user = User(username=username, email=email, role="student", school_id=default_school.id)
             user.set_password("student123")
             db.session.add(user)
             db.session.flush()
             
             student = Student(
                 user_id=user.id,
+                school_id=default_school.id,
                 student_id=f"STU{i:03d}",
                 first_name=student_data["first_name"],
                 last_name=student_data["last_name"],
@@ -189,6 +204,7 @@ def seed_database():
                     
                     attendance = Attendance(
                         student_id=student.id,
+                        school_id=default_school.id,
                         date=attendance_date,
                         status=status,
                         check_in_time=datetime.now().time() if status != 'absent' else None,
@@ -209,6 +225,7 @@ def seed_database():
                     
                     grade = Grade(
                         student_id=student.id,
+                        school_id=default_school.id,
                         subject_id=subject.id,
                         assessment_type=assessment_type,
                         assessment_name=f"{assessment_type.title()} 1",
@@ -235,6 +252,7 @@ def seed_database():
                 
                 fee = Fee(
                     student_id=student.id,
+                    school_id=default_school.id,
                     fee_type=fee_type,
                     amount=Decimal(str(amount)),
                     due_date=due_date,
