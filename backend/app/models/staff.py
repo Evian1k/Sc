@@ -1,5 +1,6 @@
 from app import db
 from datetime import datetime
+from sqlalchemy import Numeric
 
 class Staff(db.Model):
     __tablename__ = 'staff'
@@ -15,7 +16,7 @@ class Staff(db.Model):
     address = db.Column(db.Text)
     position = db.Column(db.String(100), nullable=False)  # Teacher, Principal, Admin, etc.
     department = db.Column(db.String(100))
-    salary = db.Column(db.Decimal(10, 2))
+    salary = db.Column(Numeric(10, 2))
     hire_date = db.Column(db.Date, default=datetime.utcnow().date)
     qualification = db.Column(db.Text)
     emergency_contact = db.Column(db.String(100))
